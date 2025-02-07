@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "algoUtils"
+version = "0.1"
+authors = [
+    { name="jijingyuan", email="jijingyuan@algohood.com" },
+]
+description = "common utilities for developing algorithmic trading modules"
+requires-python = ">=3.12"
+dependencies = [
+    "aioquic==1.2.0",
+    "psutil==5.9.4",
+    "requests==2.32.0",
+    "ujson==5.7.0",
+    "numpy==1.24.2",
+    "pandas==1.5.3",
+    "websockets==13",
+    "redis==5.0.8",
+    "influxdb-client==1.46.0",
+    "aiocsv==1.3.2",
+    "aiohttp==3.10.6",
+    "pyzmq==26.2.0",
+    "tornado==6.4.1",
+    "aioredis==1.3.1",
+    "aiofiles==24.1.0",
+    "msgspec==0.18.6",
+    "scikit-learn==1.6.1",
+    "lightgbm==4.5.0"
+] 
