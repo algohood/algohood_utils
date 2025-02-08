@@ -18,7 +18,7 @@ dependencies = [
     "psutil==5.9.4",
     "requests==2.32.0",
     "ujson==5.7.0",
-    "numpy==1.24.2",
+    "numpy==1.26.4",
     "pandas==1.5.3",
     "websockets==13",
     "redis==5.0.8",
