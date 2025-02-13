@@ -31,5 +31,6 @@ dependencies = [
     "aiofiles==24.1.0",
     "msgspec==0.18.6",
     "scikit-learn==1.6.1",
-    "lightgbm==4.5.0"
+    "lightgbm==4.5.0",
+    "dataclasses==0.6.7"
 ] 
