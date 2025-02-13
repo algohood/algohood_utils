@@ -34,5 +34,5 @@ dependencies = [
     "pydantic==2.10.6",
     "autogen-agentchat==0.1.1",
     "autogen-core==0.4.6",
-    "autogen-ext==0.4.6,
+    "autogen-ext==0.4.6"
 ] 
