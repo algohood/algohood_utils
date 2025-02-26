@@ -21,8 +21,12 @@ class ConsoleOutput:
                 for char in chunk.content:
                     content += char
                     print(char, end='', flush=True)
+            elif chunk.additional_kwargs.get('reasoning_content'):
+                 for char in chunk.additional_kwargs['reasoning_content']:
+                    print(char, end='', flush=True)
         print()
         return content
+
 
     @classmethod
     def console_for_input(cls, _source_name: str, _invoke_str: str):
