@@ -4,6 +4,11 @@ import re
 
 class ConsoleOutput:
     @classmethod
+    def console_for_str(cls, _message: AnyMessage):
+        for char in _message.content:
+            print(char, end='', flush=True)
+
+    @classmethod
     def console_for_stream(cls, _source_name: str, _msg_generator: Callable, _llm_msg: Optional[List[AnyMessage]]=None):
         content = ""
         print('----------------{}----------------'.format(_source_name))
@@ -37,13 +42,14 @@ class ConsoleOutput:
         return HumanMessage(content=msg, name='user')
 
     @staticmethod
-    def extract_python_scripts(content: str) -> str:
+    def extract_python_scripts(content: str) -> Dict[str, str]:
         """
-        提取Python脚本内容（支持嵌套代码块解析）
-        返回第一个匹配的脚本内容字符串
+        修改为返回字典格式，支持多个Python脚本提取
+        返回格式：{文件名: 脚本内容}
         """
-        # 匹配python代码块（支持带文件名版本号模式）
-        pattern = re.compile(r'```python:\s*"?(?P<filename>[^"\n]+?_V\d+\.py)"?(?=\s|:|$)')
+        py_scripts = {}
+        # 统一使用带文件名的匹配模式（与markdown处理保持一致）
+        pattern = re.compile(r'```python:\s*"?(?P<filename>[^"\n]+?_V\d)"?(?=\s|:|$)')
         
         pos = 0
         while pos < len(content):
@@ -111,14 +117,14 @@ class ConsoleOutput:
                         
                 cleaned_content = '\n'.join(lines).strip()
                 
-                if cleaned_content:
-                    return cleaned_content  # 直接返回第一个有效脚本内容
+                if filename and cleaned_content:
+                    py_scripts[filename] = cleaned_content  # 改为存储到字典
                     
                 pos = content_end
             else:
                 pos = last_valid_end
         
-        return ""  # 没有找到时返回空字符串
+        return py_scripts  # 返回字典而不是字符串
 
     @staticmethod
     def extract_markdown_files(content: str) -> Dict[str, str]:
@@ -127,7 +133,7 @@ class ConsoleOutput:
         """
         md_files = {}
         # 严格匹配md:前缀的代码块
-        pattern = re.compile(r'```md:\s*"?(?P<filename>[^"\n]+?_V\d+\.md)"?(?=\s|:|$)')
+        pattern = re.compile(r'```md:\s*"?(?P<filename>[^"\n]+?_V\d)"?(?=\s|:|$)')
         
         pos = 0
         while pos < len(content):
