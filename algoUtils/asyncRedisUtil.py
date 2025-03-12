@@ -22,6 +22,7 @@ class AsyncRedisClient:
         try:
             await redis_client.select(_db)
             await redis_client.flushdb()
+            return True
 
         except Exception as e:
             logger.error(e)
@@ -50,6 +51,7 @@ class AsyncRedisClient:
         try:
             await redis_client.select(_db)
             await redis_client.delete(*key)
+            return True
 
         except Exception as e:
             logger.error(e)
@@ -63,6 +65,7 @@ class AsyncRedisClient:
         try:
             await redis_client.select(_db)
             await redis_client.set(_key, _value)
+            return True
 
         except Exception as e:
             logger.error(e)
