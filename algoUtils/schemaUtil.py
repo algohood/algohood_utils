@@ -29,7 +29,7 @@ class ExitInfo(BaseModel):
     exit_duration: float
 
 
-class Performance(BaseModel):
+class TradingResult(BaseModel):
     success: bool
     is_win: Optional[int] = None  # 1: win, 0: lose
     trade_ret: Optional[float] = None
@@ -38,7 +38,6 @@ class Performance(BaseModel):
 
 class Sample(BaseModel):
     signal: Signal
-    performance: Optional[Performance] = None
     features: Optional[Dict[str, float]] = {}
     targets: Optional[Dict[str, float]] = {}
     intercept: Optional[bool] = None
@@ -59,25 +58,12 @@ class FeatureMgrParam(BaseModel):
 
 
 class TargetMgrParam(BaseModel):
-    target_method_name: Optional[str] = None
-    target_method_param: Optional[Dict[str, Any]] = None
-    use_performance: bool = False
+    target_type: Literal['trading', 'status'] = 'status'
+    target_method_name: str
+    target_method_param: Dict[str, Any] = {}
+    entry_fee: float = 0.0001
+    exit_fee: float = 0.0001
     
-    @model_validator(mode='after')
-    def validate_fields_when_use_performance(self):
-        # 验证条件1：当use_performance为False时，那两个字段不能为None
-        if self.use_performance is False:
-            if self.target_method_name is None:
-                raise ValueError("当use_performance为False时，target_method_name不能为空")
-            if self.target_method_param is None:
-                raise ValueError("当use_performance为False时，target_method_param不能为空")
-        
-        # 验证条件2：当那两个字段不为None时，use_performance必须为False
-        if (self.target_method_name is not None or self.target_method_param is not None) and self.use_performance is True:
-            raise ValueError("当提供target_method_name或target_method_param时，use_performance必须为False")
-            
-        return self
-
 
 class ModelMgrParam(BaseModel):
     model_method_name: str
@@ -86,18 +72,10 @@ class ModelMgrParam(BaseModel):
     model_retain_size: Optional[int] = 300
 
 
-class PerformanceMgrParam(BaseModel):
-    performance_method_name: str
-    performance_method_param: Dict[str, Any] = {}
-    entry_fee: float = 0.0001
-    exit_fee: float = 0.0001
-
-
 class SignalTaskParam(BaseModel):
     signal_task_name: str
     signal_mgr_param: SignalMgrParam
     feature_mgr_params: Optional[Union[List[FeatureMgrParam], FeatureMgrParam]] = None
-    performance_mgr_param: Optional[PerformanceMgrParam] = None
     target_mgr_param: Optional[TargetMgrParam] = None
     model_mgr_param: Optional[ModelMgrParam] = None
     lag: float

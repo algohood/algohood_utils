@@ -86,7 +86,7 @@ class SignalBase(abc.ABC):
         return
 
 
-class TargetBase(abc.ABC):
+class StatusBase(abc.ABC):
     
     @abc.abstractmethod
     def init_instance(self, _signal: Signal):
@@ -159,7 +159,7 @@ class ModelBase(abc.ABC):  # 继承 abc.ABC
         pass
 
 
-class PerformanceBase(abc.ABC):
+class TradingBase(abc.ABC):
 
     @abc.abstractmethod
     def init_instance(self, _signal: Signal):
@@ -180,6 +180,15 @@ class PerformanceBase(abc.ABC):
         generate exit info for signals
         :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: ExitInfo
+        """
+        pass
+
+    @abc.abstractmethod
+    def intercept_signal_given_targets(self, _targets: TradingResult) -> bool:
+        """
+        intercept signal base on the trading result
+        :param _trading_result: trading result
+        :return: True or False
         """
         pass
 
