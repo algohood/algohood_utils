@@ -62,6 +62,17 @@ class ProfileStats:
         
         return async_wrapper if is_async else sync_wrapper
     
+    def reset(self):
+        """Reset all statistics data"""
+        # Reset function statistics dictionary
+        for func_name in self.func_stats:
+            self.func_stats[func_name] = {
+                "total_cost": 0,
+                "call_count": 0,
+                "min_time": float('inf'),
+                "max_time": 0
+            }
+            
     def show_stats(self, func_name=None):
         """
         Display statistics information
