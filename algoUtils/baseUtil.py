@@ -183,15 +183,6 @@ class TradingBase(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
-    def intercept_signal_given_targets(self, _targets: TradingResult) -> bool:
-        """
-        intercept signal base on the trading result
-        :param _trading_result: trading result
-        :return: True or False
-        """
-        pass
-
 
 class OptimizerBase(abc.ABC):
 
