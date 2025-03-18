@@ -40,7 +40,7 @@ class Sample(BaseModel):
     signal: Signal
     features: Optional[Dict[str, float]] = {}
     targets: Optional[Dict[str, float]] = {}
-    target_fields: Optional[List[str]] = None
+    fields: Optional[List[str]] = None
     intercept: Optional[bool] = None
     sim_targets: Optional[Dict[str, float]] = {}
     sim_intercept: Optional[bool] = None
@@ -59,12 +59,10 @@ class FeatureMgrParam(BaseModel):
 
 
 class TargetMgrParam(BaseModel):
-    target_type: Literal['trading', 'status'] = 'status'
     target_method_name: str
     target_method_param: Dict[str, Any] = {}
-    entry_fee: float = 0.0001
-    exit_fee: float = 0.0001
-    target_fields: Optional[List[str]] = None
+    target_fields: Optional[Union[List[str], str]] = None
+
 
 class ModelMgrParam(BaseModel):
     model_method_name: str

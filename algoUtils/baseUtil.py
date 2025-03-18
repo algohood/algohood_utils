@@ -45,25 +45,7 @@ class QuicEventBase:
         pass
 
 
-class AbstractBase(abc.ABC):
-    @abc.abstractmethod
-    def generate_abstract(self, _targets: list) -> Optional[Dict]:
-        """
-        generate signal to execution module
-        :param _targets: targets
-        :return: [{
-            'batch_id': str(uuid),
-            'symbol': 'btc_usdt|binance_future',
-            'action': 'open' or 'close'
-            'position': 'long' or 'short'
-            **kwargs: other info that you need for analyze
-        }, ...]
-        """
-        return
-
-
 class SignalBase(abc.ABC):
-
     @abc.abstractmethod
     def update_state(self, _data: Dict[str, List[List]]):
         """
@@ -86,8 +68,7 @@ class SignalBase(abc.ABC):
         return
 
 
-class StatusBase(abc.ABC):
-    
+class TargetBase(abc.ABC):
     @abc.abstractmethod
     def init_instance(self, _signal: Signal):
         pass
@@ -159,8 +140,7 @@ class ModelBase(abc.ABC):  # 继承 abc.ABC
         pass
 
 
-class TradingBase(abc.ABC):
-
+class PerformanceBase(abc.ABC):
     @abc.abstractmethod
     def init_instance(self, _signal: Signal):
         pass
@@ -185,21 +165,18 @@ class TradingBase(abc.ABC):
 
 
 class OptimizerBase(abc.ABC):
-
     @abc.abstractmethod
     def handle_event(self, _event_type, _event) -> Optional[List[str]]:
         pass
 
 
 class RiskBase(abc.ABC):
-
     @abc.abstractmethod
     def handle_event(self, _event_type, _event) -> Optional[List[str]]:
         pass
 
 
 class LiquidityBase(abc.ABC):
-
     @abc.abstractmethod
     def handle_event(self, _event_type, _event) -> Optional[Dict[str, float]]:
         pass
