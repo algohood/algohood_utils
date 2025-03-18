@@ -40,6 +40,7 @@ class Sample(BaseModel):
     signal: Signal
     features: Optional[Dict[str, float]] = {}
     targets: Optional[Dict[str, float]] = {}
+    target_fields: Optional[List[str]] = None
     intercept: Optional[bool] = None
     sim_targets: Optional[Dict[str, float]] = {}
     sim_intercept: Optional[bool] = None
@@ -63,13 +64,13 @@ class TargetMgrParam(BaseModel):
     target_method_param: Dict[str, Any] = {}
     entry_fee: float = 0.0001
     exit_fee: float = 0.0001
-    
+    target_fields: Optional[List[str]] = None
 
 class ModelMgrParam(BaseModel):
     model_method_name: str
     model_method_param: Dict[str, Any] = {}
-    model_cache_size: Optional[int] = 1000
-    model_retain_size: Optional[int] = 300
+    model_cache_size: int = 100
+    model_retain_size: int = 0
 
 
 class SignalTaskParam(BaseModel):
@@ -83,8 +84,3 @@ class SignalTaskParam(BaseModel):
     data_type: str
     start_timestamp: float
     end_timestamp: float
-
-
-if __name__ == '__main__':
-    # print(TargetMgrParam(use_performance=True))
-    print(TargetMgrParam(use_performance=True, target_method_name='test', target_method_param={'test': 'test'}))

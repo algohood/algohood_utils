@@ -131,30 +131,30 @@ class FeatureBase(abc.ABC):
 
 class ModelBase(abc.ABC):  # 继承 abc.ABC
     @abc.abstractmethod
-    def check_feature_drift(self, _features: List[Dict[str, float]], _targets: List[float]) -> bool:
+    def check_feature_drift(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> bool:
         # 若模型不支持增量学习，则**忽略此函数**
         # 实现特征飘变检测逻辑
         pass
 
     @abc.abstractmethod
-    def incremental_train(self, _features: List[Dict[str, float]], _targets: List[float]):
+    def incremental_train(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
         # 若模型不支持增量学习，则**忽略此函数**
         # 实现增量训练逻辑
         pass
 
     @abc.abstractmethod
-    def full_train(self, _features: List[Dict[str, float]], _targets: List[float]):
+    def full_train(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
         # 实现全量训练逻辑
         pass
     
     @abc.abstractmethod
-    def train_model(self, _features: List[Dict[str, float]], _targets: List[float]):
+    def train_model(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
         # 若模型不支持增量学习，则**直接调用full_train**
         # 整合训练逻辑（全量/增量）
         pass
 
     @abc.abstractmethod
-    def predict(self, _features: Dict[str, float]) -> Optional[float]:
+    def predict(self, _features: Dict[str, float]) -> Optional[Dict[str, float]]:
         # 实现预测逻辑
         pass
 
