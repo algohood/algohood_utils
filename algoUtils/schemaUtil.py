@@ -11,8 +11,8 @@ class Signal(BaseModel):
     batch_id: str  # str(uuid)
     symbol: str  # 'btc_usdt|binance_future'
     direction: str  # 'long' or 'short'
-    timestamp: Optional[float] = None  # timestamp default is None
-    price_dict: Optional[Dict[str, float]] = None  # {'btc_usdt|binance_future': price, ...} default is None
+    timestamp: float = 0  # timestamp default is None
+    price_dict: Dict[str, float] = {}  # {'btc_usdt|binance_future': price, ...} default is None
 
 
 class EntryInfo(BaseModel):
@@ -71,6 +71,12 @@ class ModelMgrParam(BaseModel):
     model_retain_size: int = 0
 
 
+class PerformanceMgrParam(BaseModel):
+    performance_name: str
+    performance_method_name: str
+    performance_method_param: Dict[str, Any] = {}
+
+
 class SignalTaskParam(BaseModel):
     signal_task_name: str
     signal_mgr_param: SignalMgrParam
@@ -82,3 +88,9 @@ class SignalTaskParam(BaseModel):
     data_type: str
     start_timestamp: float
     end_timestamp: float
+
+
+class PerformanceTaskParam(BaseModel):
+    performance_task_name: str
+    performance_mgr_params: Union[List[PerformanceMgrParam], PerformanceMgrParam]
+    signal_paths: List[str]
