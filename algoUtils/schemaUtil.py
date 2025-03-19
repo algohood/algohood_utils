@@ -9,24 +9,22 @@ from pydantic import BaseModel, field_validator, model_validator
 
 class Signal(BaseModel):
     batch_id: str  # str(uuid)
-    symbol: str  # 'btc_usdt|binance_future'
-    direction: str  # 'long' or 'short'
-    timestamp: float = 0  # timestamp default is None
-    price_dict: Dict[str, float] = {}  # {'btc_usdt|binance_future': price, ...} default is None
+    symbol: Union[str, List[str]]  # 'btc_usdt|binance_future'
+    price: Union[float, List[float]]  # positive if long, negative if short
+    timestamp: float = 0  # timestamp default is 0   
 
-
-class EntryInfo(BaseModel):
-    entry_success: bool
-    entry_direction: Optional[str] = None # 'long' or 'short'
-    entry_price: Optional[float] = None
-    entry_timestamp: Optional[float] = None
-    entry_duration: Optional[float] = None
-
-
-class ExitInfo(BaseModel):
-    exit_price: float
-    exit_timestamp: float
-    exit_duration: float
+    @model_validator(mode='after')
+    def validate_price_and_symbol(self) -> 'Signal':
+        # 检查price和symbol的类型是否一致（都是单个值或都是列表）
+        if isinstance(self.price, list) != isinstance(self.symbol, list):
+            raise ValueError("price和symbol必须类型一致，要么都是单个值，要么都是列表")
+        
+        # 如果都是列表，检查长度是否相等
+        if isinstance(self.price, list) and isinstance(self.symbol, list):
+            if len(self.price) != len(self.symbol):
+                raise ValueError("当price和symbol都是列表时，长度必须相等")
+        
+        return self
 
 
 class TradingResult(BaseModel):
@@ -49,7 +47,6 @@ class Sample(BaseModel):
 class SignalMgrParam(BaseModel):
     signal_method_name: str
     signal_method_param: Dict[str, Any] = {}
-    cool_down_grid: Optional[float] = 0.001
     cool_down_ts: Optional[float] = 1
 
 

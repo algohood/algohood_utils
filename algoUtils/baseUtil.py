@@ -55,15 +55,15 @@ class SignalBase(abc.ABC):
         pass
     
     @abc.abstractmethod
-    def generate_signals(self, _data: Dict[str, List[List]]) -> Optional[List[Signal]]:
+    def generate_signals(self, _data: Dict[str, List[List]]) -> Optional[Signal]:
         """
         generate signal to execution module
         :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
-        :return: [Signal, ...] 
+        :return: Signal
         class Signal:
             batch_id: str  # str(uuid)
-            symbol: str  # 'btc_usdt|binance_future'
-            direction: str  # 'long' or 'short'
+            symbol: Union[str, List[str]]  # 'btc_usdt|binance_future'
+            price: Union[float, List[float]]  # positive if long, negative if short
         """
         return
 
@@ -146,20 +146,11 @@ class PerformanceBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_entry_info(self, _data: Dict[str, List[List]]) -> Optional[EntryInfo]:
+    def generate_trading_result(self, _data: Dict[str, List[List]]) -> Optional[TradingResult]:
         """
-        generate entry info for signals
+        generate trading result for signals
         :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
-        :return: EntryInfo
-        """
-        pass
-
-    @abc.abstractmethod
-    def generate_exit_info(self, _data: Dict[str, List[List]]) -> Optional[ExitInfo]:
-        """
-        generate exit info for signals
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
-        :return: ExitInfo
+        :return: TradingResult
         """
         pass
 
