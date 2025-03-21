@@ -14,17 +14,17 @@ class Signal(BaseModel):
     timestamp: float = 0  # timestamp default is 0   
 
     @model_validator(mode='after')
-    def validate_price_and_symbol(self) -> 'Signal':
+    def validate_price_and_symbol(cls, data):
         # 检查price和symbol的类型是否一致（都是单个值或都是列表）
-        if isinstance(self.price, list) != isinstance(self.symbol, list):
+        if isinstance(data.price, list) != isinstance(data.symbol, list):
             raise ValueError("price和symbol必须类型一致，要么都是单个值，要么都是列表")
         
         # 如果都是列表，检查长度是否相等
-        if isinstance(self.price, list) and isinstance(self.symbol, list):
-            if len(self.price) != len(self.symbol):
+        if isinstance(data.price, list) and isinstance(data.symbol, list):
+            if len(data.price) != len(data.symbol):
                 raise ValueError("当price和symbol都是列表时，长度必须相等")
         
-        return self
+        return data
 
 
 class TradingResult(BaseModel):
