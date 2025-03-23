@@ -6,6 +6,7 @@
 import abc
 import asyncio
 import uuid
+import numpy as np
 from typing import Optional, List, Dict
 from .schemaUtil import *
 
@@ -47,18 +48,20 @@ class QuicEventBase:
 
 class SignalBase(abc.ABC):
     @abc.abstractmethod
-    def update_state(self, _data: Dict[str, List[List]]):
+    def update_state(self, _current_ts: float, _data: Dict[str, np.ndarray]):
         """
         update state base on the data
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
+        :param _current_ts: current timestamp
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         """
         pass
     
     @abc.abstractmethod
-    def generate_signals(self, _data: Dict[str, List[List]]) -> Optional[Signal]:
+    def generate_signals(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Signal]:
         """
         generate signal to execution module
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
+        :param _current_ts: current timestamp
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: Signal
         class Signal:
             batch_id: str  # str(uuid)
@@ -74,10 +77,11 @@ class TargetBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_targets(self, _data: Dict[str, List[List]]) -> Optional[Dict[str, float]]:
+    def generate_targets(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Dict[str, float]]:
         """
         generate target dict that could be used in intercept modeling
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
+        :param _current_ts: current timestamp
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: None or dict
         """
         pass  # 使用 pass 而不是 return
@@ -94,17 +98,20 @@ class TargetBase(abc.ABC):
 
 class FeatureBase(abc.ABC):
     @abc.abstractmethod
-    def update_state(self, _data: Dict[str, List[List]]):
+    def update_state(self, _current_ts: float, _data: Dict[str, np.ndarray]):
         """
         update state base on the data
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
+        :param _current_ts: current timestamp
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         """
         pass
 
     @abc.abstractmethod
-    def generate_features(self) -> Optional[Dict[str, float]]:
+    def generate_features(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Dict[str, float]]:
         """
         generate features dict based on the state
+        :param _current_ts: current timestamp
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: None or dict
         """
         pass
@@ -142,14 +149,14 @@ class ModelBase(abc.ABC):  # 继承 abc.ABC
 
 class PerformanceBase(abc.ABC):
     @abc.abstractmethod
-    def init_instance(self, _signal: Signal):
+    def init_signal(self, _signal: Signal):
         pass
 
     @abc.abstractmethod
-    def generate_trading_result(self, _data: Dict[str, List[List]]) -> Optional[TradingResult]:
+    def generate_trading_result(self, _data: Dict[str, np.ndarray]) -> Optional[TradingResult]:
         """
         generate trading result for signals
-        :param _data: {symbol: [[recv_ts, exchange_ts, price, amount, direction], ...], ...}
+        :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: TradingResult
         """
         pass

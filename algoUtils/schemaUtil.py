@@ -3,7 +3,7 @@
 @File: defUtil.py
 @Author: Jijingyuan
 """
-from typing import Optional, List, Dict, Any, Union, Literal
+from typing import Optional, List, Dict, Any, Union, Literal, Hashable
 from pydantic import BaseModel, field_validator, model_validator
 
 
@@ -12,6 +12,7 @@ class Signal(BaseModel):
     symbol: Union[str, List[str]]  # 'btc_usdt|binance_future'
     price: Union[float, List[float]]  # positive if long, negative if short
     timestamp: float = 0  # timestamp default is 0   
+    other_info: Optional[Dict[Hashable, Any]] = None
 
     @model_validator(mode='after')
     def validate_price_and_symbol(cls, data):
@@ -29,6 +30,11 @@ class Signal(BaseModel):
 
 class TradingResult(BaseModel):
     success: bool
+    direction: Optional[int] = None
+    entry_price: Optional[float] = None
+    entry_timestamp: Optional[float] = None
+    exit_price: Optional[float] = None
+    exit_timestamp: Optional[float] = None
     is_win: Optional[int] = None  # 1: win, 0: lose
     trade_ret: Optional[float] = None
     trade_duration: Optional[float] = None
@@ -80,7 +86,7 @@ class SignalTaskParam(BaseModel):
     feature_mgr_params: Optional[Union[List[FeatureMgrParam], FeatureMgrParam]] = None
     target_mgr_param: Optional[TargetMgrParam] = None
     model_mgr_param: Optional[ModelMgrParam] = None
-    lag: float
+    lag: Optional[float] = None
     symbols: Union[List[str], str]
     data_type: str
     start_timestamp: float
