@@ -9,7 +9,6 @@ import asyncio
 import redis.asyncio as redis
 
 from algoUtils.loggerUtil import generate_logger
-
 logger = generate_logger(level='INFO')
 
 
@@ -27,7 +26,7 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
-
+        
         finally:
             await redis_client.aclose()
 
@@ -40,7 +39,6 @@ class AsyncRedisClient:
 
         except Exception as e:
             logger.error(e)
-            return
 
         finally:
             await redis_client.aclose()
@@ -56,7 +54,7 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
-
+        
         finally:
             await redis_client.aclose()
 
@@ -70,6 +68,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
+        
+        finally:
+            await redis_client.aclose()
 
     async def get_str(self, _db, _key) -> bytes | None:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -81,6 +82,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+        
+        finally:
+            await redis_client.aclose()
 
     async def incr(self, _db, _key, _amount=1) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -92,6 +96,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
+        
+        finally:
+            await redis_client.aclose()
 
     async def decr(self, _db, _key, _amount=1) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -104,6 +111,9 @@ class AsyncRedisClient:
             logger.error(e)
             return False
 
+        finally:
+            await redis_client.aclose()
+
     async def get_hash(self, _db, _key, _field) -> bytes | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
@@ -114,6 +124,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+
+        finally:
+            await redis_client.aclose()
 
     async def get_hash_all(self, _db, _key) -> dict | None:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -148,7 +161,7 @@ class AsyncRedisClient:
         try:
             fields = [_fields] if isinstance(_fields, str) else _fields
             await redis_client.select(_db)
-            await redis_client.hdel(_key, fields)
+            await redis_client.hdel(_key, *fields)
             return True
 
         except Exception as e:
@@ -169,13 +182,16 @@ class AsyncRedisClient:
             logger.error(e)
             return False
 
+        finally:
+            await redis_client.aclose()
+
     async def get_ts_batch_by_key(self, _db, _key, _start_ts, _end_ts, _limit=None) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
             await redis_client.select(_db)
             ts = redis_client.ts()
             batch = await ts.range(_key, _start_ts, _end_ts, count=_limit)
-            return batch or {}
+            return batch or []
 
         except Exception as e:
             logger.error(e)
@@ -216,7 +232,7 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
-
+        
         finally:
             await redis_client.aclose()
 
@@ -237,7 +253,7 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
-
+        
         finally:
             await redis_client.aclose()
 
@@ -347,6 +363,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
+        
+        finally:
+            await redis_client.aclose()
 
     async def get_set(self, _db, _key) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -358,6 +377,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+
+        finally:
+            await redis_client.aclose()
 
     async def pop_set(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -371,6 +393,9 @@ class AsyncRedisClient:
             logger.error(e)
             return False
 
+        finally:
+            await redis_client.aclose()
+
     async def lrange(self, _db, _key, _start_index=0, _end_index=-1) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
@@ -381,6 +406,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+
+        finally:
+            await redis_client.aclose()
 
     async def push(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -405,6 +433,9 @@ class AsyncRedisClient:
             logger.error(e)
             return
 
+        finally:
+            await redis_client.aclose()
+
     async def pull_block(self, _db, _key, _timeout=0) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
@@ -415,6 +446,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+
+        finally:
+            await redis_client.aclose()
 
     async def info(self, _db, _key):
         redis_client = redis.Redis(connection_pool=self.pool)
@@ -427,6 +461,9 @@ class AsyncRedisClient:
             logger.error(e)
             return
 
+        finally:
+            await redis_client.aclose()
+
     async def get_set_by_score(self, _db, _key, _min, _max, _limit=None) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
@@ -438,6 +475,9 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return
+
+        finally:
+            await redis_client.aclose()
 
 
 if __name__ == '__main__':
