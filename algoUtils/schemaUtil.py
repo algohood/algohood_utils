@@ -31,9 +31,7 @@ class Signal(BaseModel):
 class TradingResult(BaseModel):
     success: bool
     direction: Optional[int] = None
-    entry_price: Optional[float] = None
     entry_timestamp: Optional[float] = None
-    exit_price: Optional[float] = None
     exit_timestamp: Optional[float] = None
     is_win: Optional[int] = None  # 1: win, 0: lose
     trade_ret: Optional[float] = None
