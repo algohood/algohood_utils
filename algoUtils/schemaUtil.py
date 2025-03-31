@@ -78,6 +78,12 @@ class PerformanceMgrParam(BaseModel):
     performance_method_param: Dict[str, Any] = {}
 
 
+class ExecuteMgrParam(BaseModel):
+    execute_name: str
+    execute_method_name: str
+    execute_method_param: Dict[str, Any] = {}
+
+
 class SignalTaskParam(BaseModel):
     signal_task_name: str
     signal_mgr_param: SignalMgrParam
