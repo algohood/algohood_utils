@@ -490,7 +490,7 @@ class OrderBase(abc.ABC):
         return sniffer_info
 
 
-class StrategyBase(abc.ABC):
+class ExecuteBase(abc.ABC):
     def __init__(self):
         self.order_mgr: Optional[OrderBase] = None
         self.logger: Optional[OnlineLogger] = None
