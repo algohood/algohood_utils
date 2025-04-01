@@ -322,7 +322,6 @@ class OrderBase(abc.ABC):
     ):
 
         order_id = str(uuid.uuid4())
-        _, exchange = _symbol.split('|')
         self.__sniffers[order_id] = {
             'order_id': order_id,
             'batch_id': _batch_id,
@@ -355,7 +354,6 @@ class OrderBase(abc.ABC):
     ):
 
         order_id = str(uuid.uuid4())
-        _, exchange = _symbol.split('|')
         self.__sniffers[order_id] = {
             'order_id': order_id,
             'batch_id': _batch_id,
