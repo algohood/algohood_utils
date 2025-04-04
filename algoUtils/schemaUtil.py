@@ -101,3 +101,134 @@ class PerformanceTaskParam(BaseModel):
     performance_task_name: str
     performance_mgr_params: Union[List[PerformanceMgrParam], PerformanceMgrParam]
     signal_paths: List[str]
+
+
+class UpdateOrderInfo(BaseModel):
+    """
+    更新订单信息
+    """
+    order_id: str
+    status: Literal['waiting', 'triggered', 'partial_filled', 'canceling', 'canceled', 'error', 'filled']
+    exchange_timestamp: float
+    local_timestamp: float
+    execute_price: Optional[float] = None
+    execute_amount: Optional[float] = None
+    fee_rate: Optional[float] = None
+    msg: Optional[Dict[str, Any]] = None
+
+
+class UpdateSnifferInfo(BaseModel):
+    """
+    更新嗅探器信息
+    """
+    order_id: str
+    status: Literal['waiting', 'triggered', 'canceled', 'error']
+    exchange_timestamp: float
+    local_timestamp: float
+
+
+class PrecisionDict(BaseModel):
+    """
+    精度字典
+    """
+    price: int
+    amount: int
+
+
+class OrderInfo(BaseModel):
+    """
+    订单信息
+    """
+    order_id: str
+    batch_id: str
+    symbol: str
+    order_type: Literal['market', 'limit', 'condition_limit', 'condition_market']
+    action: Literal['open', 'close']
+    position: Literal['long', 'short']
+    direction: Literal[-1, 1] = 1
+    amount: float
+    feature: Optional[Literal['fok', 'fak', 'gtx', 'queue']] = None
+    expire: Optional[float] = None
+    delay: Optional[float] = None
+    condition: Optional[Dict[str, Any]] = None
+    price: Optional[float] = None
+    status: Literal['pending', 'waiting', 'triggered', 'partial_filled', 'canceling', 'canceled', 'error', 'filled'] = 'pending'
+    current_timestamp: float
+    send_timestamp: Optional[float] = None
+    receive_timestamp: Optional[float] = None
+    exchange_timestamp: Optional[float] = None
+    local_timestamp: Optional[float] = None
+    execute_price: Optional[float] = None
+    execute_amount: Optional[float] = None
+    fee_rate: Optional[float] = None
+    msg: Optional[Dict[str, Any]] = None
+
+    @model_validator(mode='after')
+    def validate_direction(cls, data):
+        # 根据position和action自动设置direction
+        if data.position == 'long' and data.action == 'open':
+            data.direction = 1
+        elif data.position == 'long' and data.action == 'close':
+            data.direction = -1
+        elif data.position == 'short' and data.action == 'open':
+            data.direction = -1
+        elif data.position == 'short' and data.action == 'close':
+            data.direction = 1
+        return data
+    
+    def update(self, _update_info: UpdateOrderInfo):
+        self.status = _update_info.status
+        self.exchange_timestamp = _update_info.exchange_timestamp
+        self.local_timestamp = _update_info.local_timestamp
+        self.execute_price = _update_info.execute_price
+        self.execute_amount = _update_info.execute_amount
+        self.fee_rate = _update_info.fee_rate
+        self.msg = _update_info.msg
+
+
+class TargetSnifferInfo(BaseModel):
+    """
+    目标嗅探器信息
+    """
+    order_id: str
+    batch_id: str
+    symbol: str
+    exchange: str
+    operator: str
+    target_price: float
+    smooth: Optional[float] = None
+    expire: Optional[float] = None
+    delay: Optional[float] = None
+    status: Literal['pending', 'waiting', 'triggered', 'canceled', 'error'] = 'pending' 
+    exchange_timestamp: Optional[float] = None
+    local_timestamp: Optional[float] = None
+
+    def update(self, _update_info: UpdateSnifferInfo):
+        self.status = _update_info.status
+        self.exchange_timestamp = _update_info.exchange_timestamp
+        self.local_timestamp = _update_info.local_timestamp
+
+
+class TrailingSnifferInfo(BaseModel):
+    """
+    追踪嗅探器信息
+    """
+    order_id: str
+    batch_id: str
+    symbol: str
+    exchange: str
+    operator: str
+    target_price: float
+    back_pct: float
+    smooth: Optional[float] = None
+    expire: Optional[float] = None
+    delay: Optional[float] = None
+    status: Literal['pending', 'waiting', 'triggered', 'canceled', 'error'] = 'pending'
+    exchange_timestamp: Optional[float] = None
+    local_timestamp: Optional[float] = None
+
+    def update(self, _update_info: UpdateSnifferInfo):
+        self.status = _update_info.status
+        self.exchange_timestamp = _update_info.exchange_timestamp
+        self.local_timestamp = _update_info.local_timestamp
+

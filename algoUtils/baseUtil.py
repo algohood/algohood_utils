@@ -201,42 +201,36 @@ class OrderBase(abc.ABC):
     }
 
     def __init__(self):
-        self.__precision_dict = {}
-        self.__orders = {}
-        self.__sniffers = {}
-
-    @abc.abstractmethod
-    async def get_last_price(self, _symbol):
-        pass
-
-    @abc.abstractmethod
-    def get_trading_amount(self, _symbol):
-        pass
-
-    @abc.abstractmethod
-    def get_current_timestamp(self):
-        pass
+        self.__precision_dict: Dict[str, PrecisionDict] = {}
 
     def format_amount(self, _symbol, _amount, _upper=True):
-        amount_p = self.__precision_dict[_symbol]['amount']
+        amount_p = self.__precision_dict[_symbol].amount
         factor = 10 ** amount_p
         int_amount = int(_amount * factor)
         bias = 1 if _upper else 0
         return round((int_amount + bias) / factor, amount_p)
 
     def format_price(self, _symbol, _price, _upper=True):
-        amount_p = self.__precision_dict[_symbol]['price']
-        factor = 10 ** amount_p
-        int_amount = int(_price * factor)
+        price_p = self.__precision_dict[_symbol].price
+        factor = 10 ** price_p
+        int_price = int(_price * factor)
         bias = 1 if _upper else 0
-        return round((int_amount + bias) / factor, amount_p)
+        return round((int_price + bias) / factor, price_p)
+    
+    @abc.abstractmethod
+    def get_current_price(self, _symbol) -> float:
+        pass
 
     @abc.abstractmethod
-    async def place_timer(
-            self,
-            _to_timestamp,
-            _event,
-    ):
+    def get_trading_cash(self, _symbol) -> float:
+        pass
+
+    @abc.abstractmethod
+    def get_current_timestamp(self) -> float:
+        pass
+
+    @abc.abstractmethod
+    async def place_timer(self, _to_timestamp, _event):
         pass
 
     @abc.abstractmethod
@@ -290,202 +284,9 @@ class OrderBase(abc.ABC):
     async def cancel_sniffer(self, _order_id, _delay=None):
         pass
 
-    def _get_order_info(self, _order_id):
-        return self.__orders.get(_order_id)
-
-    def _get_sniffer_info(self, _order_id):
-        return self.__sniffers.get(_order_id)
-
-    def _set_precision_dict(self, _symbol, _price, _amount):
-        self.__precision_dict[_symbol] = {'price': _price, 'amount': _amount}
-
-    def get_precision_dict(self, _symbol):
-        return self.__precision_dict.get(_symbol)
-
-    def _update_round_timestamp(self, _order_id, _send_timestamp=None, _receive_timestamp=None):
-        if _send_timestamp is not None:
-            self.__orders[_order_id]['send_timestamp'] = _send_timestamp
-
-        if _receive_timestamp is not None:
-            self.__orders[_order_id]['receive_timestamp'] = _receive_timestamp
-
-    def _generate_target_sniffer(
-            self,
-            _batch_id,
-            _symbol,
-            _exchange,
-            _target_price,
-            _operator,
-            _smooth=None,
-            _expire=None,
-            _delay=None
-    ):
-
-        order_id = str(uuid.uuid4())
-        self.__sniffers[order_id] = {
-            'order_id': order_id,
-            'batch_id': _batch_id,
-            'symbol': _symbol,
-            'exchange': _exchange,
-            'order_type': 'target',
-            'operator': _operator,
-            'target_price': _target_price,
-            'smooth': _smooth,
-            'expire': _expire,
-            'delay': _delay,
-            'status': 'pending',
-            'last_timestamp': None,
-            'local_timestamp': None,
-        }
-
-        return order_id
-
-    def _generate_trailing_sniffer(
-            self,
-            _batch_id,
-            _symbol,
-            _exchange,
-            _operator,
-            _target_price,
-            _back_pct,
-            _smooth=None,
-            _expire=None,
-            _delay=None
-    ):
-
-        order_id = str(uuid.uuid4())
-        self.__sniffers[order_id] = {
-            'order_id': order_id,
-            'batch_id': _batch_id,
-            'symbol': _symbol,
-            'exchange': _exchange,
-            'order_type': 'trailing',
-            'operator': _operator,
-            'back_pct': _back_pct,
-            'smooth': _smooth,
-            'expire': _expire,
-            'delay': _delay,
-            'status': 'pending',
-            'last_timestamp': None,
-            'local_timestamp': None,
-        }
-
-        return order_id
-
-    def _generate_order(
-            self,
-            _batch_id,
-            _symbol,
-            _exchange,
-            _order_type,
-            _action,
-            _position,
-            _amount,
-            _feature=None,
-            _expire=None,
-            _delay=None,
-            _condition=None,
-            _price=None,
-    ):
-        order_id = str(uuid.uuid4())
-        self.__orders[order_id] = {
-            'order_id': order_id,
-            'batch_id': _batch_id,
-            'symbol': _symbol,
-            'exchange': _exchange,
-            'order_type': _order_type,
-            'action': _action,
-            'position': _position,
-            'amount': _amount,
-            'feature': _feature,
-            'expire': _expire,
-            'delay': _delay,
-            'condition': _condition,
-            'price': _price,
-            'status': 'pending',
-            'current_timestamp': self.get_current_timestamp(),
-            'send_timestamp': None,
-            'receive_timestamp': None,
-            'last_timestamp': None,
-            'local_timestamp': None,
-            'execute_price': None,
-            'execute_amount': 0,
-            'fee_rate': None,
-            'msg': None
-        }
-        return order_id
-
-    def _remove_order(self, _order_id):
-        self.__orders.pop(_order_id, None)
-
-    def _remove_sniffer(self, _order_id):
-        self.__sniffers.pop(_order_id, None)
-
-    def _update_order_info(
-            self,
-            _order_id,
-            _status,
-            _last_timestamp,
-            _local_timestamp,
-            _execute_price=None,
-            _execute_amount=0,
-            _fee_rate=None,
-            _msg=None
-    ):
-        order_info = self.__orders.get(_order_id)
-        if order_info is None:
-            return
-
-        if self.ORDER_STATUS[_status] < self.ORDER_STATUS[order_info['status']]:
-            return
-
-        elif self.ORDER_STATUS[_status] == self.ORDER_STATUS[order_info['status']]:
-            if _execute_amount <= (order_info['execute_amount'] or 0):
-                return
-
-        order_info['status'] = _status
-        order_info['last_timestamp'] = float(_last_timestamp)
-        order_info['local_timestamp'] = float(_local_timestamp)
-
-        if _execute_price is not None:
-            order_info['execute_price'] = float(_execute_price)
-
-        if _execute_amount is not None:
-            order_info['execute_amount'] = float(_execute_amount)
-
-        if _fee_rate is not None:
-            order_info['fee_rate'] = _fee_rate
-
-        if _msg is not None:
-            order_info['msg'] = _msg
-
-        if self.ORDER_STATUS[_status] >= 5:
-            self.__orders.pop(_order_id)
-
-        return order_info
-
-    def _update_sniffer_info(
-            self,
-            _order_id,
-            _status,
-            _last_timestamp,
-            _local_timestamp,
-    ):
-        sniffer_info = self.__sniffers.get(_order_id)
-        if sniffer_info is None:
-            return
-
-        if self.ORDER_STATUS[_status] < self.ORDER_STATUS[sniffer_info['status']]:
-            return
-
-        sniffer_info['status'] = _status
-        sniffer_info['last_timestamp'] = float(_last_timestamp)
-        sniffer_info['local_timestamp'] = float(_local_timestamp)
-
-        if self.SNIFFER_STATUS[_status] >= 2:
-            self.__sniffers.pop(_order_id)
-
-        return sniffer_info
+    @abc.abstractmethod
+    def _update_precision_dict(self, _symbol: str, _trades: np.ndarray): 
+        pass
 
 
 class ExecuteBase(abc.ABC):
@@ -498,15 +299,15 @@ class ExecuteBase(abc.ABC):
         self.logger = OnlineLogger(_logger_type)
 
     @abc.abstractmethod
-    async def on_signal(self, _signal):
+    async def on_signal(self, _signal: Signal):
         pass
 
     @abc.abstractmethod
-    async def on_order(self, _order_info):
+    async def on_order(self, _order_info: OrderInfo):
         pass
 
     @abc.abstractmethod
-    async def on_sniffer(self, _sniffer_info):
+    async def on_sniffer(self, _sniffer_info: TargetSnifferInfo | TrailingSnifferInfo):
         pass
 
     @abc.abstractmethod
