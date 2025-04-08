@@ -201,17 +201,17 @@ class OrderBase(abc.ABC):
     }
 
     def __init__(self):
-        self.__precision_dict: Dict[str, PrecisionDict] = {}
+        self._precision_dict: Dict[str, PrecisionDict] = {}
 
-    def format_amount(self, _symbol, _amount, _upper=True):
-        amount_p = self.__precision_dict[_symbol].amount
+    def format_amount(self, _symbol, _amount, _upper=True) -> float:
+        amount_p = self._precision_dict[_symbol].amount
         factor = 10 ** amount_p
         int_amount = int(_amount * factor)
         bias = 1 if _upper else 0
         return round((int_amount + bias) / factor, amount_p)
 
-    def format_price(self, _symbol, _price, _upper=True):
-        price_p = self.__precision_dict[_symbol].price
+    def format_price(self, _symbol, _price, _upper=True) -> float:
+        price_p = self._precision_dict[_symbol].price
         factor = 10 ** price_p
         int_price = int(_price * factor)
         bias = 1 if _upper else 0
@@ -291,10 +291,10 @@ class OrderBase(abc.ABC):
 
 class ExecuteBase(abc.ABC):
     def __init__(self):
-        self.order_mgr: Optional[OrderBase] = None
-        self.logger: Optional[OnlineLogger] = None
+        self.order_mgr: OrderBase = None  # type: ignore
+        self.logger: OnlineLogger = None # type: ignore
 
-    def init_mgr(self, _order_mgr, _logger_type):
+    def init_mgr(self, _order_mgr: OrderBase, _logger_type: str):
         self.order_mgr = _order_mgr
         self.logger = OnlineLogger(_logger_type)
 
