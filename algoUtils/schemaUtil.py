@@ -162,7 +162,7 @@ class OrderInfo(BaseModel):
     order_type: Literal['market', 'limit', 'condition_limit', 'condition_market']
     action: Literal['open', 'close']
     position: Literal['long', 'short']
-    direction: Literal[-1, 1] = 1
+    direction: Literal[-1, 0, 1] = 0
     amount: float
     feature: Optional[Literal['fok', 'fak', 'gtx', 'queue']] = None
     expire: Optional[float] = None
@@ -206,7 +206,7 @@ class OrderInfo(BaseModel):
     @model_validator(mode='after')
     def validate_price_required(cls, data):
         # 当order_type为limit或condition_limit时，price不可为空
-        if data.order_type in ['limit', 'condition_limit'] and data.price is None:
+        if data.order_type in ['limit', 'condition_limit'] and data.price is None and data.feature != 'queue':
             raise ValueError(f"当order_type为'{data.order_type}'时，price字段不能为空")
         return data
     
