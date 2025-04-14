@@ -117,6 +117,15 @@ class FeatureBase(abc.ABC):
         pass
 
 
+class SelectorBase(abc.ABC):
+    @abc.abstractmethod
+    def select_features(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> Optional[List[str]]:
+        # 实现因子筛选逻辑
+        # 返回筛选后的因子列表
+        # 若不筛选，则返回 None
+        pass
+
+
 class ModelBase(abc.ABC):  # 继承 abc.ABC
     @abc.abstractmethod
     def check_feature_drift(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> bool:

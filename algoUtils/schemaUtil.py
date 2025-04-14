@@ -68,9 +68,16 @@ class TargetMgrParam(BaseModel):
 class ModelMgrParam(BaseModel):
     model_method_name: str
     model_method_param: Dict[str, Any] = {}
-    model_cache_size: int = 100
-    model_retain_size: int = 0
+    selector_method_name: str
+    selector_method_param: Dict[str, Any] = {}
+    cache_size: int
+    retain_size: int
 
+    @model_validator(mode='after')
+    def validate_cache_and_retain_size(cls, data):
+        if data.model_cache_size < data.model_retain_size:
+            raise ValueError(f"model_cache_size必须大于model_retain_size")
+        return data
 
 class PerformanceMgrParam(BaseModel):
     performance_name: str
@@ -82,6 +89,24 @@ class ExecuteMgrParam(BaseModel):
     execute_name: str
     execute_method_name: str
     execute_method_param: Dict[str, Any] = {}
+
+
+class OptimizeMgrParam(BaseModel):
+    optimize_name: str
+    optimize_method_name: str
+    optimize_method_param: Dict[str, Any] = {}
+
+
+class RiskMgrParam(BaseModel):
+    risk_name: str
+    risk_method_name: str
+    risk_method_param: Dict[str, Any] = {}
+
+
+class LiquidityMgrParam(BaseModel):
+    liquidity_name: str
+    liquidity_method_name: str
+    liquidity_method_param: Dict[str, Any] = {}
 
 
 class SignalTaskParam(BaseModel):
@@ -97,10 +122,13 @@ class SignalTaskParam(BaseModel):
     end_timestamp: float
 
 
-class PerformanceTaskParam(BaseModel):
-    performance_task_name: str
-    performance_mgr_params: Union[List[PerformanceMgrParam], PerformanceMgrParam]
-    signal_paths: List[str]
+class PortfolioTaskParam(BaseModel):
+    portfolio_task_name: str
+    signal_task_names: List[str]
+    optimize_mgr_param: OptimizeMgrParam
+    risk_mgr_param: RiskMgrParam
+    liquidity_mgr_param: LiquidityMgrParam
+    execute_abstracts: List[Dict[str, Any]]
 
 
 class UpdateOrderInfo(BaseModel):
