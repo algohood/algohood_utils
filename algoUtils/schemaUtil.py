@@ -68,8 +68,25 @@ class TargetMgrParam(BaseModel):
 class ModelMgrParam(BaseModel):
     model_method_name: str
     model_method_param: Dict[str, Any] = {}
-    model_cache_size: int = 100
-    model_retain_size: int = 0
+    selector_method_name: str
+    selector_method_param: Dict[str, Any] = {}
+    cache_size: int = 100
+    retain_size: int = 0
+
+
+class OptimizeMgrParam(BaseModel):
+    optimize_method_name: str
+    optimize_method_param: Dict[str, Any] = {}
+
+
+class RiskMgrParam(BaseModel):
+    risk_method_name: str
+    risk_method_param: Dict[str, Any] = {}
+
+
+class LiquidityMgrParam(BaseModel):
+    liquidity_method_name: str
+    liquidity_method_param: Dict[str, Any] = {}
 
 
 class PerformanceMgrParam(BaseModel):
@@ -101,6 +118,22 @@ class PerformanceTaskParam(BaseModel):
     performance_task_name: str
     performance_mgr_params: Union[List[PerformanceMgrParam], PerformanceMgrParam]
     signal_paths: List[str]
+
+
+class PortfolioTaskParam(BaseModel):
+    portfolio_task_name: str
+    optimize_mgr_param: OptimizeMgrParam
+    risk_mgr_param: RiskMgrParam
+    liquidity_mgr_param: LiquidityMgrParam
+    open_rebalance: bool = False
+    close_rebalance: bool = False
+    interval: Optional[int] = None
+    data_type: str = 'trade'
+
+
+class OrderTaskParam(BaseModel):
+    order_task_name: str
+    result_paths: Union[List[str], str]
 
 
 class UpdateOrderInfo(BaseModel):
@@ -304,3 +337,16 @@ class TrailingSnifferInfo(BaseModel):
         if name in ['current_timestamp', 'exchange_timestamp', 'local_timestamp'] and value is not None:
             value = round(float(value), 6)
         super().__setattr__(name, value)
+
+
+class EarningInfo(BaseModel):
+    """
+    盈利信息
+    """
+    batch_id: str
+    close_timestamp: float
+    batch_ret: float
+    batch_ret_after_fee: float
+    opt_pass: bool
+    rsk_pass: bool
+    
