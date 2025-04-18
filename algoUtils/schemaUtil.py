@@ -70,14 +70,9 @@ class ModelMgrParam(BaseModel):
     model_method_param: Dict[str, Any] = {}
     selector_method_name: str
     selector_method_param: Dict[str, Any] = {}
-    cache_size: int
-    retain_size: int
+    cache_size: int = 100
+    retain_size: int = 0
 
-    @model_validator(mode='after')
-    def validate_cache_and_retain_size(cls, data):
-        if data.model_cache_size < data.model_retain_size:
-            raise ValueError(f"model_cache_size必须大于model_retain_size")
-        return data
 
 class PerformanceMgrParam(BaseModel):
     performance_name: str
@@ -124,11 +119,18 @@ class SignalTaskParam(BaseModel):
 
 class PortfolioTaskParam(BaseModel):
     portfolio_task_name: str
-    signal_task_names: List[str]
     optimize_mgr_param: OptimizeMgrParam
     risk_mgr_param: RiskMgrParam
     liquidity_mgr_param: LiquidityMgrParam
-    execute_abstracts: List[Dict[str, Any]]
+    open_rebalance: bool = False
+    close_rebalance: bool = False
+    interval: Optional[int] = None
+    data_type: str = 'trade'
+
+
+class OrderTaskParam(BaseModel):
+    order_task_name: str
+    result_paths: Union[List[str], str]
 
 
 class UpdateOrderInfo(BaseModel):
@@ -332,3 +334,16 @@ class TrailingSnifferInfo(BaseModel):
         if name in ['current_timestamp', 'exchange_timestamp', 'local_timestamp'] and value is not None:
             value = round(float(value), 6)
         super().__setattr__(name, value)
+
+
+class EarningInfo(BaseModel):
+    """
+    盈利信息
+    """
+    batch_id: str
+    close_timestamp: float
+    batch_ret: float
+    batch_ret_after_fee: float
+    opt_pass: bool
+    rsk_pass: bool
+    

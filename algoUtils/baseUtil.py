@@ -120,9 +120,9 @@ class FeatureBase(abc.ABC):
 class SelectorBase(abc.ABC):
     @abc.abstractmethod
     def select_features(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> Optional[List[str]]:
-        # 实现因子筛选逻辑
-        # 返回筛选后的因子列表
-        # 若不筛选，则返回 None
+        # 筛选特征
+        # 返回特征列表
+        # 特征列表为空，则不进行特征筛选
         pass
 
 
@@ -173,19 +173,79 @@ class PerformanceBase(abc.ABC):
 
 class OptimizerBase(abc.ABC):
     @abc.abstractmethod
-    def handle_event(self, _event_type, _event) -> Optional[List[str]]:
+    def on_timer(self, _current_ts: float) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def on_order(self, _current_ts: float, _strategy_id: str, _order_info: OrderInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def on_sniffer(self, _current_ts: float, _strategy_id: str, _sniffer_info: TargetSnifferInfo | TrailingSnifferInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def on_earning(self, _current_ts: float, _strategy_id: str, _earning_info: EarningInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        pass
+
+    @abc.abstractmethod
+    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
         pass
 
 
 class RiskBase(abc.ABC):
     @abc.abstractmethod
-    def handle_event(self, _event_type, _event) -> Optional[List[str]]:
+    def on_timer(self, _current_ts: float) -> Optional[List[str]]:
+        pass
+    
+    @abc.abstractmethod
+    def on_order(self, _current_ts: float, _strategy_id: str, _order_info: OrderInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def on_sniffer(self, _current_ts: float, _strategy_id: str, _sniffer_info: TargetSnifferInfo | TrailingSnifferInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def on_earning(self, _current_ts: float, _strategy_id: str, _earning_info: EarningInfo) -> Optional[List[str]]:
+        pass
+
+    @abc.abstractmethod
+    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        pass
+
+    @abc.abstractmethod
+    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
         pass
 
 
 class LiquidityBase(abc.ABC):
     @abc.abstractmethod
-    def handle_event(self, _event_type, _event) -> Optional[Dict[str, float]]:
+    def on_timer(self, _current_ts: float) -> Optional[Dict[str, float]]:
+        pass
+    
+    @abc.abstractmethod
+    def on_order(self, _current_ts: float, _strategy_id: str, _order_info: OrderInfo) -> Optional[Dict[str, float]]:
+        pass
+
+    @abc.abstractmethod
+    def on_sniffer(self, _current_ts: float, _strategy_id: str, _sniffer_info: TargetSnifferInfo | TrailingSnifferInfo) -> Optional[Dict[str, float]]:
+        pass
+
+    @abc.abstractmethod
+    def on_earning(self, _current_ts: float, _strategy_id: str, _earning_info: EarningInfo) -> Optional[Dict[str, float]]:
+        pass
+
+    @abc.abstractmethod
+    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        pass
+
+    @abc.abstractmethod
+    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
         pass
 
 
