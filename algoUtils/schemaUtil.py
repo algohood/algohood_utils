@@ -87,19 +87,16 @@ class ExecuteMgrParam(BaseModel):
 
 
 class OptimizeMgrParam(BaseModel):
-    optimize_name: str
     optimize_method_name: str
     optimize_method_param: Dict[str, Any] = {}
 
 
 class RiskMgrParam(BaseModel):
-    risk_name: str
     risk_method_name: str
     risk_method_param: Dict[str, Any] = {}
 
 
 class LiquidityMgrParam(BaseModel):
-    liquidity_name: str
     liquidity_method_name: str
     liquidity_method_param: Dict[str, Any] = {}
 
@@ -244,8 +241,8 @@ class OrderInfo(BaseModel):
         self.status = _update_info.status
         self.exchange_timestamp = round(_update_info.exchange_timestamp, 6)
         self.local_timestamp = round(_update_info.local_timestamp, 6)
-        self.execute_price = _update_info.execute_price
-        self.execute_amount = _update_info.execute_amount
+        self.execute_price = float(_update_info.execute_price)
+        self.execute_amount = float(_update_info.execute_amount)
         self.fee_rate = _update_info.fee_rate
         self.msg = _update_info.msg
 
@@ -257,6 +254,8 @@ class OrderInfo(BaseModel):
     def __setattr__(self, name, value):
         if name in ['current_timestamp', 'send_timestamp', 'receive_timestamp', 'exchange_timestamp', 'local_timestamp'] and value is not None:
             value = round(float(value), 6)
+        elif name == 'price' and value is not None:
+            value = float(value)
         super().__setattr__(name, value)
 
 
