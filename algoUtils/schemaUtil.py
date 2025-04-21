@@ -24,6 +24,11 @@ class Signal(BaseModel):
         if isinstance(data.price, list) and isinstance(data.symbol, list):
             if len(data.price) != len(data.symbol):
                 raise ValueError("当price和symbol都是列表时，长度必须相等")
+            
+        if isinstance(data.price, list):
+            data.price = [float(p) for p in data.price]
+        else:
+            data.price = float(data.price)
         
         return data
 
