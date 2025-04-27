@@ -40,7 +40,8 @@ class TradingResult(BaseModel):
     exit_timestamp: Optional[float] = None
     is_win: Optional[int] = None  # 1: win, 0: lose
     trade_ret: Optional[float] = None
-    trade_duration: Optional[float] = None
+    open_duration: Optional[float] = None
+    close_duration: Optional[float] = None
 
 
 class Sample(BaseModel):

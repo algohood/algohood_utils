@@ -37,4 +37,5 @@ dependencies = [
     "langchain_deepseek",
     "langgraph",
     "langchain_core",
+    "matplotlib"
 ]
