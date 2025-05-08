@@ -287,6 +287,10 @@ class OrderBase(abc.ABC):
         return round((int_price + bias) / factor, price_p)
     
     @abc.abstractmethod
+    async def get_batch_price(self, _symbol, _start_ts, _end_ts) -> np.ndarray:
+        pass
+
+    @abc.abstractmethod
     def get_current_price(self, _symbol) -> float:
         pass
 
@@ -389,4 +393,12 @@ class ExecuteBase(abc.ABC):
 
     @abc.abstractmethod
     async def on_stop(self, _event):
+        pass
+
+    @abc.abstractmethod
+    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List]]]:
+        pass
+
+    @abc.abstractmethod
+    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List]]]):
         pass
