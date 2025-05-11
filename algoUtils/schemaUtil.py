@@ -281,6 +281,7 @@ class TargetSnifferInfo(BaseModel):
     current_timestamp: float
     exchange_timestamp: Optional[float] = None
     local_timestamp: Optional[float] = None
+    drop: bool = True
 
     @field_validator('current_timestamp', 'exchange_timestamp', 'local_timestamp')
     @classmethod
@@ -320,6 +321,7 @@ class TrailingSnifferInfo(BaseModel):
     exchange_timestamp: Optional[float] = None
     local_timestamp: Optional[float] = None
     other_info: Dict[str, Any] = {}
+    drop: bool = True
 
     @field_validator('current_timestamp', 'exchange_timestamp', 'local_timestamp')
     @classmethod

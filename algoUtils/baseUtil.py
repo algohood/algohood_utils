@@ -331,7 +331,8 @@ class OrderBase(abc.ABC):
             _operator,
             _target_price,
             _expire=None,
-            _delay=None
+            _delay=None,
+            _drop=True
     ) -> str:
         pass
 
@@ -345,7 +346,8 @@ class OrderBase(abc.ABC):
             _back_pct,
             _smooth=None,
             _expire=None,
-            _delay=None
+            _delay=None,
+            _drop=True
     ) -> str:
         pass
 
