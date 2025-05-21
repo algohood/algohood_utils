@@ -4,8 +4,6 @@
 @Author: Jijingyuan
 """
 import abc
-import asyncio
-import uuid
 import numpy as np
 from typing import Optional, List, Dict
 from .schemaUtil import *
@@ -14,36 +12,6 @@ from .loggerUtil import generate_logger
 from .onlineLoggerUtil import OnlineLogger
 
 logger = generate_logger()
-
-
-class QuicEventBase:
-    def __init__(self):
-        self.connections = {}
-        self.cache = asyncio.Queue()
-
-    def on_connected(self, _host_id: bytes):
-        pass
-
-    def on_disconnected(self, _host_id: bytes):
-        pass
-
-    async def get_data(self):
-        return await self.cache.get()
-
-    async def send_msg(self, _host_id: bytes, _msg: bytes):
-        conn = self.connections.get(_host_id)
-        if not conn:
-            logger.error('{} is not available'.format(_host_id))
-            return
-
-        await conn.send_msg(_msg)
-
-    async def send_all(self, _msg: bytes):
-        tasks = [v.send_msg(_msg) for v in self.connections.values()]
-        await asyncio.gather(*tasks)
-
-    async def loop_service(self):
-        pass
 
 
 class SignalBase(abc.ABC):
@@ -69,6 +37,22 @@ class SignalBase(abc.ABC):
             price: Union[float, List[float]]  # positive if long, negative if short
         """
         return
+    
+    @abc.abstractmethod
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
+        pass
 
 
 class TargetBase(abc.ABC):
@@ -95,6 +79,22 @@ class TargetBase(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
+        pass
+
 
 class FeatureBase(abc.ABC):
     @abc.abstractmethod
@@ -116,6 +116,22 @@ class FeatureBase(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
+        pass
+
 
 class SelectorBase(abc.ABC):
     @abc.abstractmethod
@@ -123,6 +139,22 @@ class SelectorBase(abc.ABC):
         # 筛选特征
         # 返回特征列表
         # 特征列表为空，则不进行特征筛选
+        pass
+
+    @abc.abstractmethod
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass
 
 
@@ -153,6 +185,22 @@ class ModelBase(abc.ABC):  # 继承 abc.ABC
     @abc.abstractmethod
     def predict(self, _features: Dict[str, float]) -> Optional[Dict[str, float]]:
         # 实现预测逻辑
+        pass
+
+    @abc.abstractmethod
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass
 
 
@@ -189,11 +237,19 @@ class OptimizerBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
-        pass
-
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
     @abc.abstractmethod
-    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass
 
 
@@ -215,11 +271,19 @@ class RiskBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
-        pass
-
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
     @abc.abstractmethod
-    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass
 
 
@@ -241,11 +305,19 @@ class LiquidityBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
-        pass
-
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
     @abc.abstractmethod
-    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List, Dict]]]):
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass
 
 
@@ -398,9 +470,17 @@ class ExecuteBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_local_values(self) -> Optional[Dict[str, Union[float, str, List]]]:
-        pass
-
+    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+        """
+        get module params
+        :return: module params
+        """
+        return
+    
     @abc.abstractmethod
-    def set_local_values(self, _local_dict: Optional[Dict[str, Union[float, str, List]]]):
+    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+        """
+        set module params
+        :param _params: module params
+        """
         pass

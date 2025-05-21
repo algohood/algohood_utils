@@ -348,6 +348,8 @@ class EarningInfo(BaseModel):
     盈利信息
     """
     batch_id: str
+    start_timestamp: float
+    open_timestamp: float
     close_timestamp: float
     batch_ret: float
     batch_ret_after_fee: float
