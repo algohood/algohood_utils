@@ -116,8 +116,6 @@ class SignalTaskParam(BaseModel):
     lag: Optional[float] = None
     symbols: Union[List[str], str]
     data_type: str
-    start_timestamp: float
-    end_timestamp: float
 
 
 class PortfolioTaskParam(BaseModel):
@@ -134,6 +132,17 @@ class PortfolioTaskParam(BaseModel):
 class OrderTaskParam(BaseModel):
     order_task_name: str
     result_paths: Union[List[str], str]
+
+
+class OnlineTaskParam(BaseModel):
+    online_task_name: str
+    signal_tasks: List[SignalTaskParam]
+    execute_tasks: List[ExecuteMgrParam]
+    portfolio_task: PortfolioTaskParam
+    backward_duration: float
+    max_cash: float
+    max_loss: float
+    is_online: bool = False
 
 
 class UpdateOrderInfo(BaseModel):
