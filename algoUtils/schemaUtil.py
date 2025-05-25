@@ -143,6 +143,7 @@ class OnlineTaskParam(BaseModel):
     max_cash: float
     max_loss: float
     is_online: bool = False
+    mode: Literal['replace', 'update'] = 'update'
 
 
 class UpdateOrderInfo(BaseModel):
