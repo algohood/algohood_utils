@@ -352,6 +352,34 @@ class AsyncRedisClient:
         finally:
             await redis_client.aclose()
 
+    async def add_sorted_set(self, _db, _key, _batch: dict) -> bool:
+        redis_client = redis.Redis(connection_pool=self.pool)
+        try:
+            await redis_client.select(_db)
+            await redis_client.zadd(_key, mapping=_batch)
+            return True
+        
+        except Exception as e:
+            logger.error(e)
+            return False
+
+        finally:
+            await redis_client.aclose()
+
+    async def get_sorted_set(self, _db, _key, _start, _end, _limit=None) -> list | None:
+        redis_client = redis.Redis(connection_pool=self.pool)
+        try:
+            await redis_client.select(_db)
+            rsp = await redis_client.zrangebyscore(_key, min=_start, max=_end, start=0, num=_limit)
+            return rsp or []
+
+        except Exception as e:
+            logger.error(e)
+            return
+        
+        finally:
+            await redis_client.aclose()
+
     async def add_set(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
         batch = [_batch] if isinstance(_batch, str) else _batch
