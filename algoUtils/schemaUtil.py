@@ -129,8 +129,8 @@ class PortfolioTaskParam(BaseModel):
     data_type: str = 'trade'
 
 
-class OrderTaskParam(BaseModel):
-    order_task_name: str
+class ExecuteTaskParam(BaseModel):
+    execute_task_name: str
     result_paths: Union[List[str], str]
 
 
