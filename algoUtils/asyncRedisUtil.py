@@ -5,7 +5,7 @@
 @Author: Jijingyuan
 """
 import asyncio
-
+import traceback
 import redis.asyncio as redis
 
 from algoUtils.loggerUtil import generate_logger
@@ -356,23 +356,23 @@ class AsyncRedisClient:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
             await redis_client.select(_db)
-            await redis_client.zadd(_key, mapping=_batch)
+            await redis_client.zadd(_key, mapping=_batch, xx=True)
             return True
         
         except Exception as e:
-            logger.error(e)
+            logger.error(traceback.format_exc())
             return False
 
         finally:
             await redis_client.aclose()
 
-    async def get_sorted_set(self, _db, _key, _start, _end, _limit=None) -> list | None:
+    async def get_sorted_set(self, _db, _key, _start, _end, _limit, _by_score=True) -> list | None:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
             await redis_client.select(_db)
-            rsp = await redis_client.zrangebyscore(_key, min=_start, max=_end, start=0, num=_limit)
+            rsp = await redis_client.zrange(_key, start=_start, end=_end, offset=0, num=_limit, byscore=_by_score)
             return rsp or []
-
+        
         except Exception as e:
             logger.error(e)
             return
