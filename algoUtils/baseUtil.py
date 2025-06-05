@@ -5,7 +5,7 @@
 """
 import abc
 import numpy as np
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from .schemaUtil import *
 
 from .loggerUtil import generate_logger
@@ -39,18 +39,18 @@ class SignalBase(abc.ABC):
         return
     
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -80,18 +80,18 @@ class TargetBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -117,18 +117,18 @@ class FeatureBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -142,18 +142,18 @@ class SelectorBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -188,18 +188,18 @@ class ModelBase(abc.ABC):  # 继承 abc.ABC
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -237,18 +237,18 @@ class OptimizerBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -271,18 +271,18 @@ class RiskBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -305,18 +305,18 @@ class LiquidityBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
 
@@ -435,6 +435,22 @@ class OrderBase(abc.ABC):
     def _update_precision_dict(self, _symbol: str, _trades: np.ndarray): 
         pass
 
+    @abc.abstractmethod
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
+        """
+        get module status
+        :return: module status
+        """
+        return
+    
+    @abc.abstractmethod
+    def set_module_status(self, _status: Dict[str, Any]):
+        """
+        set module status
+        :param _status: module status
+        """
+        pass
+
 
 class ExecuteBase(abc.ABC):
     def __init__(self):
@@ -470,17 +486,17 @@ class ExecuteBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_module_params(self) -> Optional[Dict[str, Union[float, str, List, Dict]]]:
+    def get_module_status(self) -> Optional[Dict[str, Any]]:
         """
-        get module params
-        :return: module params
+        get module status
+        :return: module status
         """
         return
     
     @abc.abstractmethod
-    def set_module_params(self, _params: Dict[str, Union[float, str, List, Dict]]):
+    def set_module_status(self, _status: Dict[str, Any]):
         """
-        set module params
-        :param _params: module params
+        set module status
+        :param _status: module status
         """
         pass
