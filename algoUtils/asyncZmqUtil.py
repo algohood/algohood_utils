@@ -22,7 +22,7 @@ class AsyncReqZmq:
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect('tcp://{}:{}'.format(_host or 'localhost', _port))
 
-    async def send_msg(self, _msg):
+    async def send_msg(self, _msg: bytes):
         try:
             await self.socket.send(_msg)
             rsp = await self.socket.recv()
@@ -42,7 +42,7 @@ class AsyncRouterZmq:
         request_id, _, msg = await self.socket.recv_multipart()
         return request_id, msg
 
-    async def send_msg(self, _request_id, _msg):
+    async def send_msg(self, _request_id: bytes, _msg: bytes):
         try:
             parts = [_request_id, b'', _msg]
             await self.socket.send_multipart(parts)
