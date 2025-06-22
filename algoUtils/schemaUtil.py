@@ -144,7 +144,6 @@ class PortfolioTaskParam(BaseModel):
 
 
 class OnlineTaskParam(BaseModel):
-    online_name: str
     signal_tasks: List[SignalTaskParam]
     execute_tasks: List[ExecuteTaskParam]
     portfolio_task: PortfolioTaskParam
