@@ -45,7 +45,7 @@ class AsyncRedisClient:
 
     async def remove(self, _db, _key) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
-        key = [_key] if isinstance(_key, str) else _key
+        key = [_key] if isinstance(_key, str | bytes) else _key
         try:
             await redis_client.select(_db)
             await redis_client.delete(*key)
@@ -159,7 +159,7 @@ class AsyncRedisClient:
     async def remove_hash(self, _db, _key, _fields) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
-            fields = [_fields] if isinstance(_fields, str) else _fields
+            fields = [_fields] if isinstance(_fields, str | bytes) else _fields
             await redis_client.select(_db)
             await redis_client.hdel(_key, *fields)
             return True
@@ -356,7 +356,7 @@ class AsyncRedisClient:
         redis_client = redis.Redis(connection_pool=self.pool)
         try:
             await redis_client.select(_db)
-            await redis_client.zadd(_key, mapping=_batch, xx=True)
+            await redis_client.zadd(_key, mapping=_batch)
             return True
         
         except Exception as e:
@@ -382,7 +382,7 @@ class AsyncRedisClient:
 
     async def add_set(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
-        batch = [_batch] if isinstance(_batch, str) else _batch
+        batch = [_batch] if isinstance(_batch, str | bytes) else _batch
         try:
             await redis_client.select(_db)
             await redis_client.sadd(_key, *batch)
@@ -411,7 +411,7 @@ class AsyncRedisClient:
 
     async def pop_set(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
-        batch = [_batch] if isinstance(_batch, str) else _batch
+        batch = [_batch] if isinstance(_batch, str | bytes) else _batch
         try:
             await redis_client.select(_db)
             await redis_client.srem(_key, *batch)
@@ -440,7 +440,7 @@ class AsyncRedisClient:
 
     async def push(self, _db, _key, _batch) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
-        batch = [_batch] if isinstance(_batch, str) else _batch
+        batch = [_batch] if isinstance(_batch, str | bytes) else _batch
         try:
             await redis_client.select(_db)
             await redis_client.rpush(_key, *batch)
