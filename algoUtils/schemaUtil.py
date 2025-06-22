@@ -81,13 +81,11 @@ class ModelMgrParam(BaseModel):
 
 
 class PerformanceMgrParam(BaseModel):
-    performance_name: str
     performance_method_name: str
     performance_method_param: Dict[str, Any] = {}
 
 
 class ExecuteMgrParam(BaseModel):
-    execute_name: str
     execute_method_name: str
     execute_method_param: Dict[str, Any] = {}
 
@@ -108,7 +106,7 @@ class LiquidityMgrParam(BaseModel):
 
 
 class SignalTaskParam(BaseModel):
-    signal_task_name: str
+    signal_name: str
     signal_mgr_param: SignalMgrParam
     feature_mgr_params: Optional[Union[List[FeatureMgrParam], FeatureMgrParam]] = None
     target_mgr_param: Optional[TargetMgrParam] = None
@@ -118,8 +116,22 @@ class SignalTaskParam(BaseModel):
     data_type: str
 
 
+class PerformanceTaskParam(BaseModel):
+    performance_name: str
+    performance_mgr_param: PerformanceMgrParam
+    signal_task_id: Optional[str] = None
+    signal_name: Optional[str] = None
+
+
+class ExecuteTaskParam(BaseModel):
+    execute_name: str
+    execute_mgr_param: ExecuteMgrParam
+    signal_task_id: Optional[str] = None
+    signal_name: Optional[str] = None
+
+
 class PortfolioTaskParam(BaseModel):
-    portfolio_task_name: str
+    portfolio_name: str
     optimize_mgr_param: OptimizeMgrParam
     risk_mgr_param: RiskMgrParam
     liquidity_mgr_param: LiquidityMgrParam
@@ -127,17 +139,14 @@ class PortfolioTaskParam(BaseModel):
     close_rebalance: bool = False
     interval: Optional[int] = None
     data_type: str = 'trade'
-
-
-class ExecuteTaskParam(BaseModel):
-    execute_task_name: str
-    result_paths: Union[List[str], str]
+    execute_task_id: Optional[str] = None
+    execute_names: Optional[List[str]] = None
 
 
 class OnlineTaskParam(BaseModel):
-    online_task_name: str
+    online_name: str
     signal_tasks: List[SignalTaskParam]
-    execute_tasks: List[ExecuteMgrParam]
+    execute_tasks: List[ExecuteTaskParam]
     portfolio_task: PortfolioTaskParam
     backward_duration: float
     max_cash: float
