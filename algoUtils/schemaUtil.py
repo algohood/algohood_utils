@@ -49,9 +49,6 @@ class Sample(BaseModel):
     features: Optional[Dict[str, float]] = {}
     targets: Optional[Dict[str, float]] = {}
     fields: Optional[List[str]] = None
-    intercept: Optional[bool] = None
-    sim_targets: Optional[Dict[str, float]] = {}
-    sim_intercept: Optional[bool] = None
 
 
 class SignalMgrParam(BaseModel):

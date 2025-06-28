@@ -43,12 +43,12 @@ class AsyncRedisClient:
         finally:
             await redis_client.aclose()
 
-    async def remove(self, _db, _key) -> bool:
+    async def remove(self, _db, _keys) -> bool:
         redis_client = redis.Redis(connection_pool=self.pool)
-        key = [_key] if isinstance(_key, str | bytes) else _key
+        keys = [_keys] if isinstance(_keys, str | bytes) else _keys
         try:
             await redis_client.select(_db)
-            await redis_client.delete(*key)
+            await redis_client.delete(*keys)
             return True
 
         except Exception as e:
@@ -167,6 +167,19 @@ class AsyncRedisClient:
         except Exception as e:
             logger.error(e)
             return False
+
+        finally:
+            await redis_client.aclose()
+
+    async def get_hash_keys(self, _db, _key) -> list | None:
+        redis_client = redis.Redis(connection_pool=self.pool)
+        try:
+            await redis_client.select(_db)
+            keys = await redis_client.hkeys(_key)
+            return keys or []
+
+        except Exception as e:
+            logger.error(e)
 
         finally:
             await redis_client.aclose()
