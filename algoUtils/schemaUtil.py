@@ -33,6 +33,53 @@ class Signal(BaseModel):
         return data
 
 
+class Features(BaseModel):
+    feature_fields: List[str]
+    features: List[float]
+
+    @model_validator(mode='after')
+    def validate_features(cls, data):
+        if len(data.feature_fields) != len(data.features):
+            raise ValueError("feature_fields和features的长度必须相等")
+        
+        return data
+
+    def as_dict(self):
+        return {field: value for field, value in zip(self.feature_fields, self.features)}
+    
+    def update(self, other_features: 'Features'):
+        """
+        合并两个Features对象
+        
+        Args:
+            other_features: 要合并的另一个Features对象
+            
+        Returns:
+            None，直接修改当前对象
+        """
+        if not isinstance(other_features, Features):
+            raise ValueError("参数必须是Features类型")
+        
+        # 创建字段到索引的映射，用于快速查找
+        current_field_map = {field: idx for idx, field in enumerate(self.feature_fields)}
+        
+        # 遍历要合并的features
+        for field, value in zip(other_features.feature_fields, other_features.features):
+            if field in current_field_map:
+                # 如果字段已存在，更新值
+                self.features[current_field_map[field]] = value
+            else:
+                # 如果字段不存在，添加新字段和值
+                self.feature_fields.append(field)
+                self.features.append(value)
+
+
+class Target(BaseModel):
+    target_name: str
+    target: Union[float, list[float]]
+    target_timestamp: float = 0
+
+
 class TradingResult(BaseModel):
     success: bool
     direction: Optional[int] = None
@@ -46,9 +93,8 @@ class TradingResult(BaseModel):
 
 class Sample(BaseModel):
     signal: Signal
-    features: Optional[Dict[str, float]] = {}
-    targets: Optional[Dict[str, float]] = {}
-    fields: Optional[List[str]] = None
+    features: Optional[Features] = None
+    target: Optional[Target] = None
 
 
 class SignalMgrParam(BaseModel):
@@ -68,13 +114,14 @@ class TargetMgrParam(BaseModel):
     target_fields: Optional[Union[List[str], str]] = None
 
 
+class SelectorMgrParam(BaseModel):
+    selector_method_name: str
+    selector_method_param: Dict[str, Any] = {}
+
+
 class ModelMgrParam(BaseModel):
     model_method_name: str
     model_method_param: Dict[str, Any] = {}
-    selector_method_name: str
-    selector_method_param: Dict[str, Any] = {}
-    cache_size: int = 100
-    retain_size: int = 0
 
 
 class PerformanceMgrParam(BaseModel):

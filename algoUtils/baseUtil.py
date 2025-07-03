@@ -6,6 +6,8 @@
 import abc
 import numpy as np
 from typing import Optional, List, Dict, Any
+
+from pydantic import UUID4
 from .schemaUtil import *
 
 from .loggerUtil import generate_logger
@@ -61,23 +63,14 @@ class TargetBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_targets(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Dict[str, float]]:
+    def generate_targets(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Target]:
         """
         generate target dict that could be used in intercept modeling
         :param _current_ts: current timestamp
         :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
-        :return: None or dict
+        :return: None or Target
         """
         pass  # 使用 pass 而不是 return
-
-    @abc.abstractmethod
-    def intercept_signal_given_targets(self, _targets: Dict[str, float]) -> bool:
-        """
-        intercept signal base on the target
-        :param _targets: targets
-        :return: True or False
-        """
-        pass
 
     @abc.abstractmethod
     def get_module_status(self) -> Optional[Dict[str, Any]]:
@@ -107,12 +100,12 @@ class FeatureBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_features(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Dict[str, float]]:
+    def generate_features(self, _current_ts: float, _data: Dict[str, np.ndarray]) -> Optional[Features]:
         """
         generate features dict based on the state
         :param _current_ts: current timestamp
         :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
-        :return: None or dict
+        :return: None or Features
         """
         pass
 
@@ -381,54 +374,54 @@ class OrderBase(abc.ABC):
     @abc.abstractmethod
     async def place_order(
             self,
-            _batch_id,
-            _symbol,
-            _order_type,
-            _action,
-            _position,
-            _amount,
-            _feature=None,
-            _expire=None,
-            _delay=None,
-            _condition=None,
-            _price=None,
+            _batch_id: str,
+            _symbol: str,
+            _order_type: Literal['market', 'limit', 'condition_limit', 'condition_market'],
+            _action: Literal['open', 'close'],
+            _position: Literal['long', 'short'],
+            _amount: float,
+            _feature: Optional[Literal['fok', 'fak', 'gtx', 'queue']] = None,
+            _expire: Optional[float] = None,
+            _delay: Optional[float] = None,
+            _condition: Optional[Dict[str, Any]] = None,
+            _price: Optional[float] = None,
     ) -> str:
         pass
 
     @abc.abstractmethod
     async def place_target_sniffer(
             self,
-            _batch_id,
-            _symbol,
-            _operator,
-            _target_price,
-            _expire=None,
-            _delay=None,
-            _drop=True
+            _batch_id: str,
+            _symbol: str,
+            _operator: str,
+            _target_price: float,
+            _expire: Optional[float] = None,
+            _delay: Optional[float] = None,
+            _drop: bool = True
     ) -> str:
         pass
 
     @abc.abstractmethod
     async def place_trailing_sniffer(
             self,
-            _batch_id,
-            _symbol,
-            _operator,
-            _target_price,
-            _back_pct,
-            _smooth=None,
-            _expire=None,
-            _delay=None,
-            _drop=True
+            _batch_id: str,
+            _symbol: str,
+            _operator: str,
+            _target_price: float,
+            _back_pct: float,
+            _smooth: Optional[float] = None,
+            _expire: Optional[float] = None,
+            _delay: Optional[float] = None,
+            _drop: bool = True
     ) -> str:
         pass
 
     @abc.abstractmethod
-    async def cancel_order(self, _order_id, _delay=None):
+    async def cancel_order(self, _order_id: str, _delay: Optional[float] = None):
         pass
 
     @abc.abstractmethod
-    async def cancel_sniffer(self, _order_id, _delay=None):
+    async def cancel_sniffer(self, _order_id: str, _delay: Optional[float] = None):
         pass
 
     @abc.abstractmethod
