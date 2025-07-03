@@ -35,7 +35,7 @@ class Signal(BaseModel):
 
 class Features(BaseModel):
     feature_fields: List[str]
-    features: List[float]
+    features: List[Optional[float]]
 
     @model_validator(mode='after')
     def validate_features(cls, data):
@@ -46,6 +46,13 @@ class Features(BaseModel):
 
     def as_dict(self):
         return {field: value for field, value in zip(self.feature_fields, self.features)}
+    
+    @classmethod
+    def from_dict(cls, _features_dict: Dict[str, Optional[float]]):
+        return cls(
+            feature_fields=list(_features_dict.keys()),
+            features=list(_features_dict.values())
+        )
     
     def update(self, other_features: 'Features'):
         """
