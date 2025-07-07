@@ -70,7 +70,17 @@ class TargetBase(abc.ABC):
         :param _data: {symbol: np.ndarray[[recv_ts, exchange_ts, price, amount, direction], ...], ...}
         :return: None or Target
         """
-        pass  # 使用 pass 而不是 return
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def signal_passed(_target: Target) -> bool:
+        """
+        signal passed
+        :param _target: Target
+        :return: bool
+        """
+        pass
 
     @abc.abstractmethod
     def get_module_status(self) -> Optional[Dict[str, Any]]:
@@ -128,7 +138,7 @@ class FeatureBase(abc.ABC):
 
 class SelectorBase(abc.ABC):
     @abc.abstractmethod
-    def select_features(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> Optional[List[str]]:
+    def select_features(self, _features: Features, _target: Target) -> Optional[List[str]]:
         # 筛选特征
         # 返回特征列表
         # 特征列表为空，则不进行特征筛选
@@ -153,30 +163,24 @@ class SelectorBase(abc.ABC):
 
 class ModelBase(abc.ABC):  # 继承 abc.ABC
     @abc.abstractmethod
-    def check_feature_drift(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]) -> bool:
-        # 若模型不支持增量学习，则**忽略此函数**
-        # 实现特征飘变检测逻辑
-        pass
-
-    @abc.abstractmethod
-    def incremental_train(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
+    def incremental_train(self, _features: Features, _target: Target):
         # 若模型不支持增量学习，则**忽略此函数**
         # 实现增量训练逻辑
         pass
 
     @abc.abstractmethod
-    def full_train(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
+    def full_train(self, _features: Features, _target: Target):
         # 实现全量训练逻辑
         pass
     
     @abc.abstractmethod
-    def train_model(self, _features: List[Dict[str, float]], _targets: List[Dict[str, float]]):
+    def train_model(self, _features: Features, _target: Target):
         # 若模型不支持增量学习，则**直接调用full_train**
         # 整合训练逻辑（全量/增量）
         pass
 
     @abc.abstractmethod
-    def predict(self, _features: Dict[str, float]) -> Optional[Dict[str, float]]:
+    def predict(self, _features: Features) -> Target:
         # 实现预测逻辑
         pass
 

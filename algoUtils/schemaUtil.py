@@ -54,6 +54,12 @@ class Features(BaseModel):
             features=list(_features_dict.values())
         )
     
+    def filter(self, _fields: List[str]):
+        return Features(
+            feature_fields=[field for field in self.feature_fields if field in _fields],
+            features=[value for field, value in zip(self.feature_fields, self.features) if field in _fields]
+        )
+    
     def update(self, other_features: 'Features'):
         """
         合并两个Features对象
@@ -83,8 +89,8 @@ class Features(BaseModel):
 
 class Target(BaseModel):
     target_name: str
-    target: Union[float, list[float]]
-    target_timestamp: float = 0
+    target: float
+    timestamp: float = 0
 
 
 class TradingResult(BaseModel):
@@ -102,6 +108,9 @@ class Sample(BaseModel):
     signal: Signal
     features: Optional[Features] = None
     target: Optional[Target] = None
+    forcast: Optional[Target] = None
+    actual_pass: Optional[bool] = None
+    forcast_pass: Optional[bool] = None
 
 
 class SignalMgrParam(BaseModel):
@@ -118,7 +127,6 @@ class FeatureMgrParam(BaseModel):
 class TargetMgrParam(BaseModel):
     target_method_name: str
     target_method_param: Dict[str, Any] = {}
-    target_fields: Optional[Union[List[str], str]] = None
 
 
 class SelectorMgrParam(BaseModel):
@@ -161,7 +169,6 @@ class SignalTaskParam(BaseModel):
     signal_mgr_param: SignalMgrParam
     feature_mgr_params: Optional[Union[List[FeatureMgrParam], FeatureMgrParam]] = None
     target_mgr_param: Optional[TargetMgrParam] = None
-    model_mgr_param: Optional[ModelMgrParam] = None
     lag: Optional[float] = None
     symbols: Union[List[str], str]
     data_type: str
@@ -181,6 +188,15 @@ class ExecuteTaskParam(BaseModel):
     signal_name: Optional[str] = None
 
 
+class ModelTaskParam(BaseModel):
+    model_name: str
+    selector_mgr_param: SelectorMgrParam
+    model_mgr_param: ModelMgrParam
+    target_mgr_param: TargetMgrParam
+    signal_task_id: Optional[str] = None
+    signal_names: Optional[Union[List[str], str]] = None
+
+
 class PortfolioTaskParam(BaseModel):
     portfolio_name: str
     optimize_mgr_param: OptimizeMgrParam
@@ -191,11 +207,12 @@ class PortfolioTaskParam(BaseModel):
     interval: Optional[int] = None
     data_type: str = 'trade'
     execute_task_id: Optional[str] = None
-    execute_names: Optional[List[str]] = None
+    execute_names: Optional[Union[List[str], str]] = None
 
 
 class OnlineTaskParam(BaseModel):
     signal_tasks: List[SignalTaskParam]
+    model_tasks: Optional[ModelTaskParam] = None
     execute_tasks: List[ExecuteTaskParam]
     portfolio_task: PortfolioTaskParam
     backward_duration: float
