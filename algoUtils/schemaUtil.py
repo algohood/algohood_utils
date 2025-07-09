@@ -212,14 +212,15 @@ class PortfolioTaskParam(BaseModel):
 
 class OnlineTaskParam(BaseModel):
     signal_tasks: List[SignalTaskParam]
-    model_tasks: Optional[ModelTaskParam] = None
+    model_task: Optional[ModelTaskParam] = None
     execute_tasks: List[ExecuteTaskParam]
     portfolio_task: PortfolioTaskParam
     backward_duration: float
     max_cash: float
     max_loss: float
     is_online: bool = False
-    mode: Literal['replace', 'update'] = 'update'
+    model_mode: Literal['merge', 'isolate'] = 'merge'
+    online_mode: Literal['replace', 'update'] = 'update'
 
 
 class UpdateOrderInfo(BaseModel):
